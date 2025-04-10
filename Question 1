@@ -1,0 +1,62 @@
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_WORDS 1000
+
+char *words[MAX_WORDS];
+int word_count = 0;
+
+// Function to reverse a string
+char* reverse(const char *str) {
+    int len = strlen(str);
+    char *rev = (char *)malloc(len + 1);
+    for (int i = 0; i < len; i++)
+        rev[i] = str[len - 1 - i];
+    rev[len] = '\0';
+    return rev;
+}
+
+// Compare function for qsort
+int cmp(const void *a, const void *b) {
+    return strcmp(*(const char **)a, *(const char **)b);
+}
+%}
+
+%%
+
+[a-zA-Z]+ {
+    if (word_count < MAX_WORDS) {
+        words[word_count++] = strdup(yytext);
+    }
+}
+
+[ \t\n]+   ; // Ignore whitespace
+.          ; // Ignore non-alphabetical characters
+
+%%
+
+int main() {
+    printf("Enter a line of words:\n");
+    yylex(); // Run the lexer
+
+    // Sort the words
+    qsort(words, word_count, sizeof(char *), cmp);
+
+    // Reverse and print each word
+    printf("Reversed words in alphabetical order:\n");
+    for (int i = 0; i < word_count; i++) {
+        char *rev = reverse(words[i]);
+        printf("%s ", rev);
+        free(rev);
+        free(words[i]);
+    }
+    printf("\n");
+
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
