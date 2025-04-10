@@ -1,0 +1,37 @@
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_WORD_LEN 100
+
+char smallest_word[MAX_WORD_LEN];
+int smallest_length = 0;
+int first_word = 1;
+%}
+
+%%
+[a-zA-Z]+    {
+                int len = yyleng;
+                if (first_word || len < smallest_length) {
+                    strncpy(smallest_word, yytext, len);
+                    smallest_word[len] = '\0';
+                    smallest_length = len;
+                    first_word = 0;
+                }
+             }
+a
+.|\n         { /* Ignore other characters */ }
+%%
+
+int main(int argc, char **argv) {
+    yylex();  // Run the lexer
+
+    if (smallest_length > 0) {
+        printf("Smallest word: %s\n", smallest_word);
+    } else {
+        printf("No words found.\n");
+    }
+
+    return 0;
+}
