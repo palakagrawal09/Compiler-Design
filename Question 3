@@ -1,0 +1,14 @@
+%{
+#include <stdio.h>
+#include <ctype.h>
+%}
+
+%%
+[a-z]       { ECHO; yylval = toupper(yytext[0]); putchar(yylval); }
+.|\n        { ECHO; }  // Echo everything else unchanged
+%%
+
+int main(int argc, char **argv) {
+    yylex();
+    return 0;
+}
